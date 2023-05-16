@@ -126,7 +126,10 @@ module FFI
               else
                 # TODO better library lookup logic
                 unless libname.start_with?("/") || FFI::Platform.windows?
-                  path = ['/usr/lib/','/usr/local/lib/','/opt/local/lib/', '/opt/homebrew/lib/'].find do |pth|
+                  dirs  = ENV.fetch('DYLD_LIBRARY_PATH',          '').split(':').map { |part| part+'/' }
+                  dirs += ENV.fetch('DYLD_FALLBACK_LIBRARY_PATH', '').split(':').map { |part| part+'/' }
+                  dirs += ['/usr/lib/','/usr/local/lib/','/opt/local/lib/', '/opt/homebrew/lib/']
+                  path = dirs.find do |pth|
                     File.exist?(pth + libname)
                   end
                   if path
